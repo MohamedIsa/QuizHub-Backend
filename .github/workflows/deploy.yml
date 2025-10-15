@@ -39,8 +39,6 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/firebase-key.json
 
       - name: Deploy to Firebase Functions
-        run: |
-          # Deploy with explicit project ID and timeout settings
-          firebase deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }} --force
+        run: firebase deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/firebase-key.json
