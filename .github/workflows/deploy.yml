@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           rm -fr package-lock.json
-          npm ci
+          npm install
 
       - name: Build NestJS project
         run: npm run build
