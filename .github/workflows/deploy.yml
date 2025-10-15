@@ -32,10 +32,15 @@ jobs:
       - name: Setup Firebase service account
         run: |
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}" | base64 -d > ${{ github.workspace }}/firebase-key.json
+          # Set the project explicitly
+          firebase use ${{ secrets.FIREBASE_PROJECT_ID }}
         env:
           FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/firebase-key.json
 
       - name: Deploy to Firebase Functions
-        run: firebase deploy --only functions
+        run: |
+          # Deploy with explicit project ID and timeout settings
+          firebase deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }} --force
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/firebase-key.json
