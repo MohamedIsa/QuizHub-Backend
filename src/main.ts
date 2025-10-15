@@ -4,24 +4,21 @@ dotenv.config();
 
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import express from 'express';
 
-const isFirebaseFunction = !!process.env.FUNCTION_NAME;
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
 
-async function createApp(expressInstance?: express.Express) {
-  const app = expressInstance
-    ? await NestFactory.create(AppModule, new ExpressAdapter(expressInstance))
-    : await NestFactory.create(AppModule);
-
+  // Set global prefix for all routes
   app.setGlobalPrefix('api/v1');
 
+  // Enable CORS
   app.enableCors({
     origin: true,
     credentials: true,
   });
 
+  // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -30,25 +27,9 @@ async function createApp(expressInstance?: express.Express) {
     }),
   );
 
-  return app;
-}
-
-async function bootstrap() {
-  if (isFirebaseFunction) return;
-
-  const app = await createApp();
   const port = process.env.PORT || 3000;
-
   await app.listen(port);
   console.log(`🚀 Server running on http://localhost:${port}`);
 }
 
-export async function createFirebaseApp(expressInstance: express.Express) {
-  const app = await createApp(expressInstance);
-  await app.init();
-  return app;
-}
-
-if (!isFirebaseFunction) {
-  bootstrap();
-}
+bootstrap();
